@@ -39,9 +39,9 @@ class ArucoDetector:
         self.dist_coefficient = dist_coefficient
 
         self.target_ids       = None
-        self.results          = dict()
 
     def get_pose(self, image:np.ndarray, target_id: List = None, draw: bool = True) -> (Dict, np.ndarray):
+        results = dict()
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.aruco_type,
@@ -51,7 +51,6 @@ class ArucoDetector:
 
         if corners:
             ids = ids.flatten().tolist()
-            target_ix = []
 
             # Draw a square around the markers
             if draw:
@@ -64,47 +63,46 @@ class ArucoDetector:
                 except:
                     if draw:
                         image = image[:, :, ::-1]
-                    return self.results, image
+                    return results, image
             else:
                 target_ix = [i for i in range(len(ids))]
                 target_id = ids
 
-            if target_ix:
-                for i, m_id in zip(target_ix, target_id):
-                    """
-                    Estimating the pose of the marker
-                    
-                    rotation_vec    : array of output rotation vectors (@sa Rodrigues)
-                    translation_vec : array of output translation vectors
-                    _ (_objPoints)  : array of object points of all the marker corners
-                    """
-                    rotation_vec, translation_vec, _ = cv2.aruco.estimatePoseSingleMarkers(corners[i],
-                                                                                           self.aruco_size,
-                                                                                           self.camera_matrix,
-                                                                                           self.dist_coefficient)
+            for i, m_id in zip(target_ix, target_id):
+                """
+                Estimating the pose of the marker
+                
+                rotation_vec    : array of output rotation vectors (@sa Rodrigues)
+                translation_vec : array of output translation vectors
+                _ (_objPoints)  : array of object points of all the marker corners
+                """
+                rotation_vec, translation_vec, _ = cv2.aruco.estimatePoseSingleMarkers(corners[i],
+                                                                                       self.aruco_size,
+                                                                                       self.camera_matrix,
+                                                                                       self.dist_coefficient)
 
-                    rotation_vec    = np.array([y for y in rotation_vec[0][0][:]])
-                    translation_vec = np.array([y for y in translation_vec[0][0][:]])
+                rotation_vec    = np.array([y for y in rotation_vec[0][0][:]])
+                translation_vec = np.array([y for y in translation_vec[0][0][:]])
 
-                    result = dict()
-                    result['R'] = rotation_vec
-                    result['T'] = translation_vec
+                result = dict()
+                result['R'] = rotation_vec
+                result['T'] = translation_vec
 
-                    cTm = get_T(rotation_vec, translation_vec)
-                    mTc = get_inv(cTm)
+                cTm = get_T(rotation_vec, translation_vec)
+                mTc = get_inv(cTm)
 
-                    result['cTm'] = cTm
-                    result['mTc'] = mTc
+                result['cTm'] = cTm
+                result['mTc'] = mTc
 
-                    self.results[m_id] = result
+                results[m_id] = result
 
-                    # Draw Axis
-                    if draw:
-                        image = draw_axis(image, self.camera_matrix, self.dist_coefficient,
-                                          rotation_vec, translation_vec)
+                # Draw Axis
+                if draw:
+                    image = draw_axis(image, self.camera_matrix, self.dist_coefficient,
+                                      rotation_vec, translation_vec)
 
             if draw:
                 image = image[:, :, ::-1]       # BGR to RGB
 
-        return self.results, image
+        return results, image
 

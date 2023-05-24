@@ -25,7 +25,7 @@ if __name__ == '__main__':
     while True:
         image, depth = sensor.get_data()
 
-        results, result_img = aruco.get_pose(image)
+        results, result_img = aruco.get_pose(image, [24])
         pprint(results)
         cv2.imshow('Estimated Pose', result_img[:, :, ::-1])
 
