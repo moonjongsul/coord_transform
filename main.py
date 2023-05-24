@@ -11,7 +11,7 @@ if __name__ == '__main__':
     sensor = RSSensor()
     sensor.start()
 
-    marker_size = 0.12  # unit: meter
+    marker_size = 0.08  # unit: meter
     marker_type = "DICT_5X5_100"
 
     k = [[sensor.info.fx, 0, sensor.info.cx],
@@ -26,7 +26,7 @@ if __name__ == '__main__':
         image, depth = sensor.get_data()
 
         results, result_img = aruco.get_pose(image)
-        # pprint(results)
+        pprint(results)
         cv2.imshow('Estimated Pose', result_img[:, :, ::-1])
 
         key = cv2.waitKey(1) & 0xFF

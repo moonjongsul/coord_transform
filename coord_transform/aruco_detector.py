@@ -27,22 +27,21 @@ ARUCO_DICT = {
 
 class ArucoDetector:
     def __init__(self,
-                 aruco_size:      float,
+                 aruco_size:       float,
                  aruco_type:       str,
                  camera_matrix:    np.ndarray,
-                 dist_coefficient: np.ndarray,
-                 target_ids:       List = None):
+                 dist_coefficient: np.ndarray):
 
         self.aruco_size       = aruco_size
         self.aruco_type       = cv2.aruco.Dictionary_get(ARUCO_DICT[aruco_type])
         self.parameters       = cv2.aruco.DetectorParameters_create()
-        self.target_ids       = target_ids
         self.camera_matrix    = camera_matrix
         self.dist_coefficient = dist_coefficient
 
-        self.results          = []
+        self.target_ids       = None
+        self.results          = dict()
 
-    def get_pose(self, image:np.ndarray, draw: bool = True) -> (Dict, np.ndarray):
+    def get_pose(self, image:np.ndarray, target_id: List = None, draw: bool = True) -> (Dict, np.ndarray):
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.aruco_type,
@@ -51,21 +50,27 @@ class ArucoDetector:
                                                                     distCoeff=self.dist_coefficient)
 
         if corners:
-            if self.target_ids is None:
-                target_ids = [i[0] for i in ids]
-            else:
-                target_ids = self.target_ids
+            ids = ids.flatten().tolist()
+            target_ix = []
 
             # Draw a square around the markers
             if draw:
-                image = np.array(image[:, :, ::-1])     # RGB to BGR
+                image = image[:, :, ::-1]  # RGB to BGR
                 cv2.aruco.drawDetectedMarkers(image, corners)
 
-            for i in range(len(ids)):
-                if ids[0] in target_ids:
-                    result = dict()
-                    result['id'] = ids[i][0]
+            if target_id is not None:
+                try:
+                    target_ix = [ids.index(i) for i in target_id]
+                except:
+                    if draw:
+                        image = image[:, :, ::-1]
+                    return self.results, image
+            else:
+                target_ix = [i for i in range(len(ids))]
+                target_id = ids
 
+            if target_ix:
+                for i, m_id in zip(target_ix, target_id):
                     """
                     Estimating the pose of the marker
                     
@@ -81,6 +86,7 @@ class ArucoDetector:
                     rotation_vec    = np.array([y for y in rotation_vec[0][0][:]])
                     translation_vec = np.array([y for y in translation_vec[0][0][:]])
 
+                    result = dict()
                     result['R'] = rotation_vec
                     result['T'] = translation_vec
 
@@ -90,7 +96,7 @@ class ArucoDetector:
                     result['cTm'] = cTm
                     result['mTc'] = mTc
 
-                    self.results.append(result)
+                    self.results[m_id] = result
 
                     # Draw Axis
                     if draw:
