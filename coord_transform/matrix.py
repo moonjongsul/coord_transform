@@ -22,7 +22,7 @@ class Matrix:
             self.rvec = None
             raise ValueError("Select unit = 'deg' or 'rad'")
 
-        self.update()
+        self.update('vec')
 
     def set_tvec(self, tvec, unit: str = 'm'):
         if isinstance(tvec, list):
@@ -40,17 +40,17 @@ class Matrix:
             self.tvec = None
             raise ValueError("Select unit = 'm' or 'cm' or 'mm'")
 
-        self.update()
+        self.update('vec')
 
     def set_T(self, T):
         self.T = T
 
-        self.update()
+        self.update('T')
 
     def set_invT(self, invT):
         self.invT = invT
 
-        self.update()
+        self.update('invT')
 
     def get_rvec(self, unit: str):
         if unit == 'deg':
@@ -79,18 +79,16 @@ class Matrix:
     def get_inv(self):
         return self.invT
 
-    def update(self):
-        if self.rvec is not None and self.tvec is not None:
-            self.T = get_T(self.rvec, self.tvec)
-            self.invT = get_inv(self.T)
-
-        if self.rvec is None and self.tvec is None and self.T is not None:
-            self.rvec, self.tvec = get_rt(self.T)
-            if self.invT is None:
+    def update(self, _in):
+        if _in == 'vec':
+            if self.rvec is not None and self.tvec is not None:
+                self.T = get_T(self.rvec, self.tvec)
                 self.invT = get_inv(self.T)
 
-        if self.rvec is None and self.tvec is None and self.invT is not None:
-            if self.T is None:
-                self.T = get_inv(self.invT)
+        elif _in == 'T':
+            self.invT = get_inv(self.T)
+            self.rvec, self.tvec = get_rt(self.T)
 
+        elif _in == 'invT':
+            self.T = get_inv(self.invT)
             self.rvec, self.tvec = get_rt(self.T)
