@@ -1,6 +1,7 @@
 import math
 import cv2
 import numpy as np
+np.set_printoptions(precision=8, suppress=True)
 
 
 def get_inv(T):
