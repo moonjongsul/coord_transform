@@ -71,6 +71,8 @@ def vec2matrix(rotation_vector):
     :param rotation_vector: array of output rotation vectors (@sa Rodrigues)
     :return: array of rotation matrix ( 3 x 3 )
     """
+    if not isinstance(rotation_vector, np.ndarray):
+        rotation_vector = np.array(rotation_vector)
     rotation_matrix, _ = cv2.Rodrigues(rotation_vector)
     return rotation_matrix
 

@@ -4,6 +4,7 @@ import numpy as np
 
 from ketisdk.sensor.realsense_sensor import RSSensor
 from coord_transform import ArucoDetector
+import coord_transform as ct
 
 
 if __name__ == '__main__':
@@ -27,6 +28,7 @@ if __name__ == '__main__':
         image, depth = sensor.get_data()
 
         results, result_img = aruco.get_pose(image)
+
         pprint(results)
         cv2.imshow('Estimated Pose', result_img[:, :, ::-1])
 

@@ -76,7 +76,7 @@ class Matrix:
     def get_T(self):
         return self.T
 
-    def get_inv(self):
+    def get_invT(self):
         return self.invT
 
     def update(self, _in):
