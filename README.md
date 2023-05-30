@@ -19,12 +19,26 @@ cTm = ct.Matrix()
 cTm.set_rvec([10, 20, 30], 'deg')
 cTm.set_tvec([0.1, 0.2, 0.3])
 
-print(cTm.get_tvec('m'))
-print(cTm.get_tvec('mm'))
-print(cTm.get_rvec('rad'))
-print(cTm.get_rvec('deg'))
-print(cTm.get_T())
-print(cTm.get_invT())
+print('1: ', cTm.get_tvec('m'))
+print('2: ', cTm.get_tvec('mm'))
+print('3: ', cTm.get_rvec('rad'))
+print('4: ', cTm.get_rvec('deg'))
+print('5: ', cTm.get_T())
+print('6: ', cTm.get_invT())
+~~~
+~~~
+1:  [0.1 0.2 0.3]
+2:  [100. 200. 300.]
+3:  [0.17453293 0.34906585 0.52359878]
+4:  [10. 20. 30.]
+5:  [[ 0.80893611 -0.45777385  0.36887053  0.1       ]
+ [ 0.51656274  0.85302778 -0.0742061   0.2       ]
+ [-0.2806872   0.25057276  0.92651389  0.3       ]
+ [ 0.          0.          0.          1.        ]]
+6:  [[ 0.80893611  0.51656274 -0.2806872  -0.1       ]
+ [-0.45777385  0.85302778  0.25057276 -0.2       ]
+ [ 0.36887053 -0.0742061   0.92651389 -0.3       ]
+ [ 0.          0.          0.          1.        ]]
 ~~~
 
 ### ArucoDetector
@@ -69,4 +83,4 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
 
-~~~s
+~~~
