@@ -56,10 +56,12 @@ def get_T(rot_vec, trans_vec):
                                  [0 0 0 | 1]
     """
     rot_matrix = vec2matrix(rot_vec)
+    trans_vec  = trans_vec.astype(float)
+
     T = np.eye(4)
 
     T[:3, :3] = rot_matrix
-    T[:3, 3] = trans_vec
+    T[:3,  3] = trans_vec
 
     return T
 
@@ -135,7 +137,23 @@ def deg2rad(args):
     else:
         return math.radians(args)
 
-def draw_axis(image, intrinsics, dist, r_vec, t_vec, size=0.02):
+def rotate(T, rotation_vector):
+    """
+    Rotate
+    :param T: Homogenoeus
+    :param rotation_vector:
+    :return:
+    """
+    rotation_vector = deg2rad(rotation_vector)
+    if T.shape == (4, 4):
+        rotation_T = get_T(rotation_vector, [0, 0, 0])
+    elif T.shape == (3, 3):
+        rotation_T = vec2matrix(rotation_vector)
+    else:
+        raise ValueError('T shape is must be 4x4 or 3x3')
+    return T @ rotation_T
+
+def draw_axis(image, intrinsics, dist, r_vec, t_vec, size=0.05):
     """
     Draw axis
     :param image: BGR image
