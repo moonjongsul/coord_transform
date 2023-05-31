@@ -100,7 +100,7 @@ def euler2rodrigues(euler_angle):
     return axis
 
 
-def rodrigues2euler(axis, angle):
+def rodrigues2euler(axis, angle=1):
     """
     Translation Rodrigues axis and angle to Euler angle
     :param axis: rotation vector
