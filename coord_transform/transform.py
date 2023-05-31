@@ -74,6 +74,17 @@ def vec2matrix(rotation_vector):
     rotation_matrix, _ = cv2.Rodrigues(rotation_vector)
     return rotation_matrix
 
+def matrix2vec(rotation_matrix):
+    """
+    Translation rotation matrix to rotation vector
+    Rotation matrix: 3 x 3
+    Rotation vector: 1 x 3
+    :param rotation_matrix: array of output rotation matrix
+    :return: array of rotation matrix ( 3 x 1 ) (@sa Rodrigues)
+    """
+    rotation_vector, _ = cv2.Rodrigues(rotation_matrix)
+    return rotation_vector
+
 def euler2rodrigues(euler_angle):
     """
     Translation euler angle to rotation vector.
