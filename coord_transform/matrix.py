@@ -3,10 +3,28 @@ from .transform import *
 class Matrix:
     def __init__(self):
 
-        self.rvec    = None
-        self.tvec    = None
-        self.T        = None
-        self.invT     = None
+        self.rmat  = None
+        self.rvec  = None
+        self.tvec  = None
+        self.euler = None
+        self.T     = None
+        self.invT  = None
+
+    def set_rmat(self, rmat):
+        if isinstance(rmat, list):
+            self.rmat = np.array(rmat)
+        else:
+            self.rmat = rmat
+
+        self.update('mat')
+
+    def set_euler(self, euler):
+        if isinstance(euler, list):
+            self.euler = np.array(euler)
+        else:
+            self.euler = euler
+
+        self.update('euler')
 
     def set_rvec(self, rvec, unit: str):
         if isinstance(rvec, list):
@@ -60,8 +78,16 @@ class Matrix:
         else:
             raise ValueError("Select unit = 'deg' or 'rad'")
 
-    def get_r_matrix(self):
+    def get_rmat(self):
         return self.T[:3, :3]
+
+    def get_euler(self, unit: str):
+        if unit == 'deg':
+            return rad2deg(self.euler)
+        elif unit == 'rad':
+            return self.euler
+        else:
+            raise ValueError("Select unit = 'deg' or 'rad'")
 
     def get_tvec(self, unit: str = 'm'):
         if unit == 'm':
@@ -81,14 +107,37 @@ class Matrix:
 
     def update(self, _in):
         if _in == 'vec':
+            self.rmat  = vec2matrix(self.rvec)
+            self.euler = rodrigues2euler(self.rvec)
+
             if self.rvec is not None and self.tvec is not None:
+                self.T = get_T(self.rvec, self.tvec)
+                self.invT = get_inv(self.T)
+
+        elif _in == 'mat':
+            self.rvec = matrix2vec(self.rmat)
+            self.euler = rodrigues2euler(self.rvec)
+
+            if self.tvec is not None:
+                self.T = get_T(self.rvec, self.tvec)
+                self.invT = get_inv(self.T)
+
+        elif _in == 'euler':
+            self.rvec = euler2rodrigues(self.euler)
+            self.rmat = vec2matrix(self.rvec)
+
+            if self.tvec is not None:
                 self.T = get_T(self.rvec, self.tvec)
                 self.invT = get_inv(self.T)
 
         elif _in == 'T':
             self.invT = get_inv(self.T)
             self.rvec, self.tvec = get_rt(self.T)
+            self.rmat  = vec2matrix(self.rvec)
+            self.euler = rodrigues2euler(self.rvec)
 
         elif _in == 'invT':
             self.T = get_inv(self.invT)
             self.rvec, self.tvec = get_rt(self.T)
+            self.rmat = vec2matrix(self.rvec)
+            self.euler = rodrigues2euler(self.rvec)

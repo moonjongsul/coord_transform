@@ -56,7 +56,7 @@ def get_T(rot_vec, trans_vec):
                                  [0 0 0 | 1]
     """
     rot_matrix = vec2matrix(rot_vec)
-    trans_vec  = trans_vec.astype(float)
+    trans_vec  = trans_vec.astype(float).reshape(3)
 
     T = np.eye(4)
 
